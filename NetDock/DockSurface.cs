@@ -85,6 +85,7 @@ public class DockSurface : Grid
         this.Bottom = other.Bottom;
         this.Left = other.Left;
         this.Right = other.Right;
+        this.Item = other.Item;
         this.Content.Child = other.DetachChild();
         this.ParentSurface = other.ParentSurface;
         other.ParentSurface = null;
@@ -313,7 +314,7 @@ public class DockSurface : Grid
     internal static DockSurface Merge(DockSurface target, DockSurface current, DockSurface next, DockDirection dir, double percent)
     {
         var brush = Brushes.Transparent;
-        var size = 6;
+        var size = 4;
         UIElement content = null;
         if (dir == DockDirection.Left) content = LayoutHelper.Horizontal(next, current, size, brush, percent);
         if (dir == DockDirection.Right) content = LayoutHelper.Horizontal(current, next, size, brush, percent);

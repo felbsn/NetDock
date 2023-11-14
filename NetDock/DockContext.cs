@@ -36,13 +36,10 @@ public class DockContext
     }
     public void OnDockItemRemoved(DockItem item)
     {
-        Console.WriteLine("@DockItemRemoved");
         DockItemRemoved?.Invoke(this, item);
     }
     public void OnDockStateChanged(DockItem item, DockState dockState)
     {
-        Console.WriteLine("@DockStateChanged");
-
         DockStateChanged?.Invoke(this, new DockStateChangedEvent
         {
             DockState = dockState,
