@@ -39,9 +39,12 @@ public class DockSurface : Grid
     public bool ShowTab
     {
         get => tabRowDefinition.Height.Value == 0;
+        //set { tabRowDefinition.Height = new GridLength(value ? 26 : 0); }
         set { tabRowDefinition.Height = new GridLength(value ? 26 : 0); }
     }
     public int id { get; } = ++dockIdx;
+
+    public event EventHandler<EventArgs> DockedItemsChanged;
 
     public DockSurface(DockContext context)
     {
@@ -62,8 +65,7 @@ public class DockSurface : Grid
             Padding = new Thickness(0),
             Margin = new Thickness(0),
             CornerRadius = new CornerRadius(0, 3, 3, 3),
-            //Background = Brushes.Red,
-            ClipToBounds = true
+            //ClipToBounds = true
 
         };
 
@@ -91,6 +93,8 @@ public class DockSurface : Grid
         other.ParentSurface = null;
 
         this.Update();
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void Add(DockItem dockItem, DockDirection dir = DockDirection.Right, double percentage = 50)
@@ -125,6 +129,8 @@ public class DockSurface : Grid
         }
 
         Update();
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void Remove()
@@ -194,6 +200,8 @@ public class DockSurface : Grid
         ParentSurface.Content.Child = remain.DetachChild();
         ParentSurface.Update();
         ParentSurface = null;
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void Clear()
@@ -205,6 +213,8 @@ public class DockSurface : Grid
         Top = null;
         Item = null;
         Update();
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public bool IsHovered(Point p, out DockSurface hovered)
@@ -268,6 +278,7 @@ public class DockSurface : Grid
             var btn = new DockTabButton()
             {
                 Title = Item.Title,
+
             };
             //var ress = Application.Current.Resources;
             //btn.Style = Application.Current.FindResource("DockButtonStyle") as Style;
@@ -276,7 +287,10 @@ public class DockSurface : Grid
 
             //Content.BorderBrush = Brushes.Goldenrod;
             Content.BorderThickness = new Thickness(2);
-            Content.BorderBrush = new SolidColorBrush(Color.FromRgb(221, 221, 221));
+            byte num = 221;
+            //Content.BorderBrush = new SolidColorBrush(Color.FromRgb(221, 221, 221));
+            Content.BorderBrush = new SolidColorBrush(Color.FromRgb(num, num, num));
+            Content.Background = new SolidColorBrush(Color.FromRgb(num, num, num));
 
             BindTabButtonEvents(btn);
 
@@ -287,6 +301,7 @@ public class DockSurface : Grid
         {
             ShowTab = false;
             Content.BorderThickness = new Thickness(0);
+            Content.Background = Brushes.Transparent;
         }
 
         if (Right != null)
@@ -308,6 +323,8 @@ public class DockSurface : Grid
             if (update)
                 Update();
         }
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
 
         return item;
     }
