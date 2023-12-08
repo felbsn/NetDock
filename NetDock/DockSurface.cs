@@ -258,8 +258,8 @@ public class DockSurface : Grid
         if (IsEmpty)
             return DockDirection.Stack;
 
-        var xSize = Math.Min(ActualWidth * .3, 80);
-        var ySize = Math.Min(ActualHeight * .3, 80);
+        var xSize = Math.Min(ActualWidth * .3, 200);
+        var ySize = Math.Min(ActualHeight * .3, 200);
 
         if (o.X < xSize) return DockDirection.Left;
         if (o.X > ActualWidth - xSize) return DockDirection.Right;
