@@ -66,7 +66,6 @@ public class DockSurface : Grid
             Margin = new Thickness(0),
             CornerRadius = new CornerRadius(0, 3, 3, 3),
             //ClipToBounds = true
-
         };
 
         Grid.SetRow(Tab, 0);
@@ -105,10 +104,15 @@ public class DockSurface : Grid
         {
             Item = dockItem;
             Content.Child = dockItem.Content;
+
+            RenderOptions.SetEdgeMode(Content, EdgeMode.Aliased);
+
             Update();
         }
         else if (HasItem)
         {
+            RenderOptions.SetEdgeMode(Content, EdgeMode.Unspecified);
+
             var currentItem = DetachItem(false);
             var current = new DockSurface(this.Context);
             current.Add(currentItem);
@@ -120,6 +124,9 @@ public class DockSurface : Grid
         }
         else
         {
+            RenderOptions.SetEdgeMode(Content, EdgeMode.Unspecified);
+
+
             var current = new DockSurface(this.Context);
             current.From(this);
 

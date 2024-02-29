@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Button x:Name="btn">
+    <Button x:Name="btn"  >
         button
     </Button>
 
@@ -17,16 +17,16 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button" >
                         <!--<Grid   Height="26" >-->
-                            <!--<Border x:Name="border" Background="#eee"  Margin="3 6 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
+                        <!--<Border x:Name="border" Background="#eee"  Margin="3 6 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="4" Direction="60" ShadowDepth="2" RenderingBias="Quality" Opacity="0.7"></DropShadowEffect>
                                 </Border.Effect>
                             </Border>-->
-                            <!--<Border x:Name="border" Background="#ddd"  Margin="0 0 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">-->
+                        <!--<Border x:Name="border" Background="#ddd"  Margin="0 0 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">-->
 
-                            <Border x:Name="border" Background="#f3f3f3"  Margin="0 1 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
-                                <ContentPresenter  x:Name="cp"    Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.FontSize="14" TextBlock.Foreground="#333"></ContentPresenter>
-                            </Border>
+                        <Border      x:Name="border" Background="#f3f3f3"  Margin="0 1 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
+                            <ContentPresenter  x:Name="cp"    Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.FontSize="14" TextBlock.Foreground="#333"></ContentPresenter>
+                        </Border>
                         <!--</Grid>-->
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
