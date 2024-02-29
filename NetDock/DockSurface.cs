@@ -288,6 +288,7 @@ public class DockSurface : Grid
             //Content.BorderBrush = Brushes.Goldenrod;
             Content.BorderThickness = new Thickness(2);
             byte num = 221;
+            num = 243;
             //Content.BorderBrush = new SolidColorBrush(Color.FromRgb(221, 221, 221));
             Content.BorderBrush = new SolidColorBrush(Color.FromRgb(num, num, num));
             Content.Background = new SolidColorBrush(Color.FromRgb(num, num, num));
