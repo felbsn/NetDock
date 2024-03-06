@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Button x:Name="btn"  >
+    <Button x:Name="btn" MinWidth="80" >
         button
     </Button>
 
@@ -25,7 +25,7 @@
                         <!--<Border x:Name="border" Background="#ddd"  Margin="0 0 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">-->
 
                         <Border      x:Name="border" Background="#f3f3f3"  Margin="0 1 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
-                            <ContentPresenter  x:Name="cp"    Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.FontSize="14" TextBlock.Foreground="#333"></ContentPresenter>
+                            <ContentPresenter  x:Name="cp"    Content="{TemplateBinding Content}" HorizontalAlignment="Left" VerticalAlignment="Center" TextBlock.FontSize="14" TextBlock.Foreground="#333"></ContentPresenter>
                         </Border>
                         <!--</Grid>-->
                         <ControlTemplate.Triggers>

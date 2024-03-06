@@ -105,13 +105,13 @@ public class DockSurface : Grid
             Item = dockItem;
             Content.Child = dockItem.Content;
 
-            RenderOptions.SetEdgeMode(Content, EdgeMode.Aliased);
+            
 
             Update();
         }
         else if (HasItem)
         {
-            RenderOptions.SetEdgeMode(Content, EdgeMode.Unspecified);
+  
 
             var currentItem = DetachItem(false);
             var current = new DockSurface(this.Context);
@@ -124,7 +124,7 @@ public class DockSurface : Grid
         }
         else
         {
-            RenderOptions.SetEdgeMode(Content, EdgeMode.Unspecified);
+        
 
 
             var current = new DockSurface(this.Context);
@@ -279,6 +279,9 @@ public class DockSurface : Grid
     {
         if (this.Item != null)
         {
+            RenderOptions.SetEdgeMode(Content, EdgeMode.Aliased);
+
+
             this.Item.Surface = this;
             this.Item.Context = this.Context;
             Tab.Children.Clear();
@@ -304,9 +307,12 @@ public class DockSurface : Grid
 
 
             Context.OnDockStateChanged(this.Item, DockState.Docked);
+
         }
         else
         {
+            RenderOptions.SetEdgeMode(Content, EdgeMode.Unspecified);
+
             ShowTab = false;
             Content.BorderThickness = new Thickness(0);
             Content.Background = Brushes.Transparent;
