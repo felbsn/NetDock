@@ -1,5 +1,7 @@
-﻿using System.Drawing;
+﻿using NetDock.Helpers;
+using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 using System.Windows.Forms;
 using System.Windows.Interop;
 
@@ -28,13 +30,11 @@ public class DockPreview : Form
         };
     }
 
-
     static bool darkMode = false;
-    static DockPreview Get(bool dark)
+    public static DockPreview Get(bool dark)
     {
         darkMode = dark;
         return Get();
-
     }
     static DockPreview Get()
     {
@@ -79,42 +79,62 @@ public class DockPreview : Form
         return instance;
     }
 
-    public static void Show(Form? grab, Rectangle initial, Rectangle target, double opacity, bool dark = false)
+    //public static void Show(Form? grab, Rectangle initial, Rectangle target, double opacity, bool dark = false)
+    //{
+    //    var preview = Get(dark);
+    //    if (!preview.Visible)
+    //    {
+    //        preview.SetBounds(initial.X, initial.Y, initial.Width, initial.Height);
+    //        preview.Show();
+    //        grab?.Activate();
+    //    }
+    //    preview.ResizeSmoothAsync(target.X, target.Y, target.Width, target.Height, opacity, 200);
+    //}
+
+    public static void Show(Action? grab, int x0, int y0, int w0, int h0, int x, int y, int w, int h, double opacity, bool dark = false)
     {
         var preview = Get(dark);
 
+        //var scale = DPIUtil.ScaleFactor(preview, new Point(x0, y0)) / 100;
+        //var screen = Screen.FromPoint(new Point(x0, y0));
 
-        if (!preview.Visible)
-        {
+        //var bounds = Screen.GetBounds(new Point(x0, y0));
 
-            preview.SetBounds(initial.X, initial.Y, initial.Width, initial.Height);
-            preview.Show();
-            grab?.Activate();
-        }
+        //var firstOne = Screen.AllScreens[0];
+        //var offset = firstOne.Bounds.Left + firstOne.Bounds.Width;
 
-        preview.ResizeSmoothAsync(target.X, target.Y, target.Width, target.Height, opacity, 200);
-    }
+        //SystemInformation.VirtualScreen
 
-    public static void Show(Action? grab, int x0, int y0, int w0, int w1, int x, int y, int w, int h, double opacity, bool dark = false)
-    {
-        var preview = Get(dark);
+        //var un = screen.Bounds;
 
+        preview.SetBounds(x, y, w, h);
+        preview.Show();
+        preview.Opacity = 0.8;
+        grab?.Invoke();
 
-        if (!preview.Visible)
-        {
+        //return;
 
-            preview.SetBounds(x0, y0, w0, w1);
-            preview.Show();
-            grab?.Invoke();
-        }
-
-        preview.ResizeSmoothAsync(x, y, w, h, opacity, 200);
+        //if (!preview.Visible)
+        //{
+        //    preview.SetBounds(x0, y0, w0, h0);
+        //    preview.Show();
+        //    grab?.Invoke();
+        //}
+        //preview.ResizeSmoothAsync(x, y, w, h, opacity, 200);
     }
 
     public static new void Hide()
     {
         var win = Get();
-        win.HideSmooth();
+        if (!win.Visible)
+            return;
+        win.Invoke(() =>
+        {
+            Form baseForm = win;
+            baseForm.Hide();
+        });
+
+        //win.HideSmooth();
     }
 
 

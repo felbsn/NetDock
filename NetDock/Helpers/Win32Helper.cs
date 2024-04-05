@@ -31,6 +31,11 @@ internal class Win32Helper
         GetCursorPos(ref w32Mouse);
         return new Point(w32Mouse.X, w32Mouse.Y);
     }
+    public static double GetWindowScaleFromPoint(double x, double y)
+    {
+        var scale = DPIUtil.ScaleFactor(null, new System.Drawing.Point((int)x, (int)y)) / 100;
+        return scale;
+    }
 
 
     private static IntPtr _handle;

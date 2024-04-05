@@ -5,6 +5,7 @@ using System.Windows.Media.Animation;
 using NetDock.Helpers;
 using NetDock.WPF.Enums;
 using NetDock.WPF.Extensions;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Point = System.Windows.Point;
 
 namespace NetDock;
@@ -220,17 +221,23 @@ public class DockWindow : Window
             this.DockItem = null;
 
             InTransition = true;
-            Transition(x, y, w, h).ContinueWith(_ =>
-            {
-                Dispatcher.Invoke(() =>
+            //Transition(x, y, w, h).ContinueWith(_ =>
+            //{
+               Dispatcher.Invoke(() =>
                 {
+                    //this.Width = w; this.Height = h;
+                    //Left = x;
+                    //Top = y;    
+
+
+
                     item.Content.Detach();
                     hovered.Add(item, dir);
                     Close();
                     HandlePreviewLost();
                     InTransition = false;
                 });
-            });
+           //});
 
             //this.ResizeSmoothAsync(x, y, w, h).ContinueWith(_ =>
             //{
@@ -250,7 +257,12 @@ public class DockWindow : Window
         //r.ShowHover(this, loc.X, loc.Y, hovered.ActualWidth, hovered.ActualHeight, dir);
 
         if (!InTransition)
-            ShowPreviewX(this, dir, loc.X, loc.Y, hovered.ActualWidth, hovered.ActualHeight);
+        {
+            var mp = Win32Helper.GetMousePosition();
+            var preview = NetDock.WPF.Forms.DockPreview.Get(false);
+            var scale = DPIUtil.ScaleFactor(preview, new System.Drawing.Point((int)mp.X, (int)mp.Y)) / 100;
+            ShowPreviewX(this, dir, loc.X, loc.Y, hovered.ActualWidth, hovered.ActualHeight, scale);
+        }
     }
 
 
@@ -338,6 +350,12 @@ public class DockWindow : Window
         double w1 = 0;
         double h1 = 0;
 
+        var preview = NetDock.WPF.Forms.DockPreview.Get(false);
+        var scale = DPIUtil.ScaleFactor(preview, new System.Drawing.Point((int)x0, (int)y0)) / 100;
+
+        w *= scale;
+        h *= scale;
+
         switch (dir)
         {
             case DockDirection.Left:
@@ -405,6 +423,89 @@ public class DockWindow : Window
 
     }
 
+    private static void ShowPreviewX(Window win, DockDirection dir, double x, double y, double w, double h, double scale)
+    {
+        var opacity = 0.7;
+
+        double x0 = 0;
+        double y0 = 0;
+        double w0 = 0;
+        double h0 = 0;
+
+        double x1 = 0;
+        double y1 = 0;
+        double w1 = 0;
+        double h1 = 0;
+
+        w *= scale;
+        h *= scale;
+
+        switch (dir)
+        {
+            case DockDirection.Left:
+                x0 = x;
+                y0 = y;
+                w0 = 0;
+                h0 = h;
+
+                x1 = x;
+                y1 = y;
+                w1 = w / 2;
+                h1 = h;
+                break;
+            case DockDirection.Right:
+                x0 = x + w;
+                y0 = y;
+                w0 = 0;
+                h0 = h;
+
+                x1 = x + w / 2;
+                y1 = y;
+                w1 = w / 2;
+                h1 = h;
+                break;
+            case DockDirection.Top:
+                x0 = x;
+                y0 = y;
+                w0 = w;
+                h0 = 0;
+
+                x1 = x;
+                y1 = y;
+                w1 = w;
+                h1 = h / 2;
+                break;
+            case DockDirection.Bottom:
+                x0 = x;
+                y0 = y + h;
+                w0 = w;
+                h0 = 0;
+
+                x1 = x;
+                y1 = y + h / 2;
+                w1 = w;
+                h1 = h / 2;
+                break;
+            case DockDirection.Stack:
+                x0 = x + w / 2;
+                y0 = y + h / 2;
+                w0 = 0;
+                h0 = 0;
+
+                x1 = x;
+                y1 = y;
+                w1 = w;
+                h1 = h;
+                break;
+        }
+
+        NetDock.WPF.Forms.DockPreview.Show(() =>
+        {
+            win.Activate();
+
+        }, (int)x0, (int)y0, (int)w0, (int)h0, (int)x1, (int)y1, (int)w1, (int)h1, opacity, false);
+
+    }
 
 
 

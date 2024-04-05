@@ -405,7 +405,10 @@ public class DockSurface : Grid
             {
                 down = true;
                 begin = Win32Helper.GetMousePosition();
-                offset = button.PointFromScreen(begin);
+                //offset = button.PointFromScreen(begin);
+                offset = e.GetPosition(this);
+                //_ = 1;
+
             }
         };
         button.PreviewMouseDoubleClick += (s, e) =>
@@ -438,14 +441,22 @@ public class DockSurface : Grid
         {
             if (!down)
                 return;
+
+            var rootWindow = Window.GetWindow(this);
+
             var pos = Win32Helper.GetMousePosition();
             var bounds = button.PointFromScreen(pos);
+            var cpos = e.GetPosition(null);
 
             if (bounds.X < 0 || bounds.Y < 0 || bounds.X > button.ActualWidth || bounds.Y > button.ActualHeight)
             {
                 var ds = this.ParentSurface ?? this;
                 var dd = this.GetCurrentDockDirectionAtParent();
                 var dp = this.ParentSurface?.GetDockPortion() ?? 0;
+
+                var mp = Win32Helper.GetMousePosition();
+                var preview = NetDock.WPF.Forms.DockPreview.Get(false);
+                var scale = DPIUtil.ScaleFactor(preview, new System.Drawing.Point((int)mp.X, (int)mp.Y)) / 100;
 
                 Detach();
                 var item = DetachItem(true);
@@ -455,12 +466,19 @@ public class DockSurface : Grid
                 win.DockedDirection = dd;
                 win.DockedPercentage = dp;
 
-                win.Left = pos.X - offset.X;
-                win.Top = pos.Y - offset.Y;
-                win.Width = ActualWidth;
-                win.Height = ActualHeight;
+                var left = rootWindow.Left + cpos.X - offset.X;
+                var top = rootWindow.Top + cpos.Y - offset.Y;
+
+                win.Left = left; //pos.X;// - offset.X;
+                win.Top = top;// - offset.Y;
+                win.Width = ActualWidth;// * scale;
+                win.Height = ActualHeight;// * scale;
 
                 win.Show();
+
+                win.Left = left; //pos.X;// - offset.X;
+                win.Top = top;// - offset.Y;
+
                 win.Activate();
                 win.DragMove();
             }
