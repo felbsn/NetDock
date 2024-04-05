@@ -24,8 +24,24 @@ namespace NetDock.WPF.Components
         public DockTabButton()
         {
             InitializeComponent();
+
+            border.MouseLeftButtonDown += (s, e) =>
+            {
+                if (e.ClickCount == 2)
+                {
+                    e.Handled = true;
+                    DoubleClick?.Invoke(s, e);
+                }
+            };
         }
 
-        public string Title { get => btn.Content.ToString(); set => btn.Content = value; }
+        public string Title { get => handle.Content.ToString(); set => handle.Content = value; }
+
+        public event EventHandler DoubleClick;
+
+        void OnDoubleClick(object sender, RoutedEventArgs e)
+        {
+            DoubleClick?.Invoke(this, e);
+        }
     }
 }

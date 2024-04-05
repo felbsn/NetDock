@@ -288,8 +288,9 @@ public class DockSurface : Grid
             var btn = new DockTabButton()
             {
                 Title = Item.Title,
-
             };
+                //as System.Windows.Controls.Button;
+
             //var ress = Application.Current.Resources;
             //btn.Style = Application.Current.FindResource("DockButtonStyle") as Style;
             Tab.Children.Add(btn);
@@ -390,28 +391,13 @@ public class DockSurface : Grid
 
         return target;
     }
-    void BindTabButtonEvents(System.Windows.Controls.Control button)
+    void BindTabButtonEvents(DockTabButton dockTabButton)
     {
         var begin = new Point();
         var offset = new Point();
         var down = false;
-        button.PreviewMouseDown += (s, e) =>
-        {
-            if (e.MiddleButton == MouseButtonState.Pressed)
-            {
-                this.Remove();
-            }
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                down = true;
-                begin = Win32Helper.GetMousePosition();
-                //offset = button.PointFromScreen(begin);
-                offset = e.GetPosition(this);
-                //_ = 1;
 
-            }
-        };
-        button.PreviewMouseDoubleClick += (s, e) =>
+        dockTabButton.handle.PreviewMouseDoubleClick += (s, e) =>
         {
             var ds = this.ParentSurface ?? this;
             var dd = this.GetCurrentDockDirectionAtParent();
@@ -436,8 +422,28 @@ public class DockSurface : Grid
             win.WindowState = WindowState.Maximized;
             win.Activate();
         };
-        button.PreviewMouseUp += (s, e) => { down = false; };
-        button.PreviewMouseMove += (s, e) =>
+        dockTabButton.handle.PreviewMouseDown += (s, e) =>
+        {
+            Console.WriteLine("ne");
+            _ = s;
+            if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                this.Remove();
+            }
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                down = true;
+                begin = Win32Helper.GetMousePosition();
+                //offset = button.PointFromScreen(begin);
+                offset = e.GetPosition(this);
+                //_ = 1;
+
+            }
+        };
+        dockTabButton.handle.PreviewMouseUp += (s, e) => { 
+            down = false;
+        };
+        dockTabButton.handle.PreviewMouseMove += (s, e) =>
         {
             if (!down)
                 return;
@@ -445,10 +451,10 @@ public class DockSurface : Grid
             var rootWindow = Window.GetWindow(this);
 
             var pos = Win32Helper.GetMousePosition();
-            var bounds = button.PointFromScreen(pos);
+            var bounds = dockTabButton.PointFromScreen(pos);
             var cpos = e.GetPosition(null);
 
-            if (bounds.X < 0 || bounds.Y < 0 || bounds.X > button.ActualWidth || bounds.Y > button.ActualHeight)
+            if (bounds.X < 0 || bounds.Y < 0 || bounds.X > dockTabButton.ActualWidth || bounds.Y > dockTabButton.ActualHeight)
             {
                 var ds = this.ParentSurface ?? this;
                 var dd = this.GetCurrentDockDirectionAtParent();
@@ -482,6 +488,10 @@ public class DockSurface : Grid
                 win.Activate();
                 win.DragMove();
             }
+        };
+        dockTabButton.closeButton.Click += (s, e) =>
+        {
+           this.Remove();
         };
     }
     UIElement DetachChild()

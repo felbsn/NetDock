@@ -5,44 +5,120 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NetDock.WPF.Components"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-
-    <Button x:Name="btn" MinWidth="80" >
-        button
-    </Button>
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="root"
+             >
 
     <UserControl.Resources>
-        <Style TargetType="Button"  >
+        <Style x:Key="EmptyButtonStyle" TargetType="Button">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button" >
-                        <!--<Grid   Height="26" >-->
-                        <!--<Border x:Name="border" Background="#eee"  Margin="3 6 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
-                                <Border.Effect>
-                                    <DropShadowEffect BlurRadius="4" Direction="60" ShadowDepth="2" RenderingBias="Quality" Opacity="0.7"></DropShadowEffect>
-                                </Border.Effect>
-                            </Border>-->
-                        <!--<Border x:Name="border" Background="#ddd"  Margin="0 0 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">-->
+                    <ControlTemplate TargetType="Button">
 
-                        <Border      x:Name="border" Background="#f3f3f3"  Margin="0 1 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
-                            <ContentPresenter  x:Name="cp"    Content="{TemplateBinding Content}" HorizontalAlignment="Left" VerticalAlignment="Center" TextBlock.FontSize="14" TextBlock.Foreground="#333"></ContentPresenter>
-                        </Border>
-                        <!--</Grid>-->
+                        <!--<ContentPresenter  x:Name="cp"    Content="{TemplateBinding Content}" HorizontalAlignment="Left" VerticalAlignment="Center" TextBlock.FontSize="14" TextBlock.Foreground="#333"></ContentPresenter>-->
+
+
+                        <TextBlock x:Name="txt" Text="{TemplateBinding Content}"  FontSize="12" 
+              Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
+              TextOptions.TextFormattingMode="Display"/>
+                        <!--<ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                --><!--<Setter TargetName="LayoutRoot" Property="Background" Value="#CE2525"/>--><!--
+                                <Setter TargetName="txt" Property="Foreground" Value="red"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>-->
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CaptionButtonStyleClose" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid x:Name="LayoutRoot"  Background="Transparent" Margin="6 0 0 0" Width="16" Height="16" >
+                            <TextBlock x:Name="txt" Text="{TemplateBinding Content}" FontFamily="Segoe MDL2 Assets" FontSize="8" 
+                        Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        TextOptions.TextFormattingMode="Display"/>
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#ddd"></Setter>
-                                <!--<Setter TargetName="cp" Property="TextBlock.Foreground" Value="White"></Setter>-->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#ccc"></Setter>
-                                <!--<Setter TargetName="cp" Property="TextBlock.Foreground" Value="#ccc"></Setter>-->
+                                <!--<Setter TargetName="LayoutRoot" Property="Background" Value="#CE2525"/>-->
+                                <Setter TargetName="txt" Property="Foreground" Value="red"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="CloseButtonStyle" TargetType="Button"  BasedOn="{StaticResource CaptionButtonStyleClose}">
+            <Setter Property="Content" Value="&#xE8BB;"/>
+        </Style>
+
+        <!--<Style TargetType="Button"  >
+           <Setter Property="Template">
+               <Setter.Value>
+                   <ControlTemplate TargetType="Button" >
+                       <Border      x:Name="border" Background="#f3f3f3"  Margin="0 1 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
+                           <StackPanel Orientation="Horizontal">
+                               <ContentPresenter  x:Name="cp"    Content="{TemplateBinding Content}" HorizontalAlignment="Left" VerticalAlignment="Center" TextBlock.FontSize="14" TextBlock.Foreground="#333"></ContentPresenter>
+                               <Button x:Name="closeButton"  Style="{StaticResource CloseButtonStyle}"  ToolTip="Close"/>
+                           </StackPanel>
+                       </Border>
+                       <ControlTemplate.Triggers>
+                           <Trigger Property="IsMouseOver" Value="True">
+                               <Setter TargetName="border" Property="Background" Value="#ddd"></Setter>
+                           </Trigger>
+                           <Trigger Property="IsPressed" Value="True">
+                               <Setter TargetName="border" Property="Background" Value="#ccc"></Setter>
+                           </Trigger>
+                       </ControlTemplate.Triggers>
+                   </ControlTemplate>
+               </Setter.Value>
+           </Setter>
+       </Style>-->
+
 
     </UserControl.Resources>
+
+    <!--<Grid x:Name="LayoutRoot"  Background="Transparent" Margin="0 0 0 0" Height="26"   >-->
+        <Border x:Name="border" Margin="0 1 0 0"   BorderThickness="0" Height="26"   CornerRadius="4 4 0 0" Padding="4">
+            <StackPanel Orientation="Horizontal" Background="Transparent">
+            <Button x:Name="handle" Style="{StaticResource EmptyButtonStyle}">
+                <!--<TextBlock x:Name="btn" Text="test"  FontSize="14"  Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center" TextOptions.TextFormattingMode="Display"/>-->
+            </Button>
+                <Button x:Name="closeButton"  ToolTip="Close" Style="{StaticResource CloseButtonStyle}"/>
+            </StackPanel>
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush>
+                            <LinearGradientBrush.GradientStops>
+                                <GradientStop Color="#f3f3f3" Offset="0"/>
+                            </LinearGradientBrush.GradientStops>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter  Property="Background" Value="#ddd"></Setter>
+                    </Trigger>
+                    <Trigger Property="IsFocused" Value="True">
+                        <Setter   Property="Background" Value="#ccc"></Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+    </Border>
+    <!--</Grid>-->
+  
+
+
+    <!--<Button x:Name="btn" MinWidth="80" >
+        button
+    </Button>-->
+  
+
+ 
 
 </UserControl>
