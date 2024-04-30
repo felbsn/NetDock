@@ -41,6 +41,7 @@ public class DockWindow : Window
         //DockedDirection = dir;
         //DockedParent = parent;
         //Ratio = ratio;
+        Context.OnDockWindowOpened(this);
 
         Icon = null;
 

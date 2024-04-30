@@ -22,11 +22,13 @@ public class DockStateChangedEvent : EventArgs
 }
 
 
+
 public class DockContext
 {
     public static DockContext Default { get; } = new();
 
     public event EventHandler<DockStateChangedEvent> DockStateChanged;
+    public event EventHandler<DockWindow> DockWindowOpened;
     public event EventHandler<DockItem> DockItemRemoved;
     public event EventHandler<DockItem> DockItemRestored;
 
@@ -46,6 +48,12 @@ public class DockContext
             Item = item,
         });
     }
+
+    public void OnDockWindowOpened(DockWindow dockWindow)
+    {
+        DockWindowOpened?.Invoke(this, dockWindow);
+    }
+
     public virtual DockWindow GetDockWindow(DockItem item) => new DockWindow(item, this);
     public virtual byte[] Serialize(DockItem item)
     {
