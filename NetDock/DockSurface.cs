@@ -426,12 +426,10 @@ public class DockSurface : Grid
         };
         dockTabButton.handle.PreviewMouseDown += (s, e) =>
         {
-            Console.WriteLine("ne");
-            _ = s;
             if (e.MiddleButton == MouseButtonState.Pressed)
             {
                 this.Remove();
-            }
+            }else
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 down = true;
@@ -491,6 +489,13 @@ public class DockSurface : Grid
 
                 win.Activate();
                 win.DragMove();
+            }
+        };
+        dockTabButton.closeButton.PreviewMouseDown += (s, e) =>
+        {
+            if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                this.Remove();
             }
         };
         dockTabButton.closeButton.Click += (s, e) =>
