@@ -10,6 +10,8 @@ using Point = System.Windows.Point;
 using NetDock.WPF.Components;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 
 namespace NetDock;
@@ -39,9 +41,12 @@ public class DockSurface : Grid
     public bool ShowTab
     {
         get => tabRowDefinition.Height.Value == 0;
+        //set { tabRowDefinition.Height = new GridLength(value ? 26 : 0); }
         set { tabRowDefinition.Height = new GridLength(value ? 26 : 0); }
     }
     public int id { get; } = ++dockIdx;
+
+    public event EventHandler<EventArgs> DockedItemsChanged;
 
     public DockSurface(DockContext context)
     {
@@ -62,9 +67,7 @@ public class DockSurface : Grid
             Padding = new Thickness(0),
             Margin = new Thickness(0),
             CornerRadius = new CornerRadius(0, 3, 3, 3),
-            //Background = Brushes.Red,
-            ClipToBounds = true
-
+            //ClipToBounds = true
         };
 
         Grid.SetRow(Tab, 0);
@@ -85,11 +88,14 @@ public class DockSurface : Grid
         this.Bottom = other.Bottom;
         this.Left = other.Left;
         this.Right = other.Right;
+        this.Item = other.Item;
         this.Content.Child = other.DetachChild();
         this.ParentSurface = other.ParentSurface;
         other.ParentSurface = null;
 
         this.Update();
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void Add(DockItem dockItem, DockDirection dir = DockDirection.Right, double percentage = 50)
@@ -100,10 +106,15 @@ public class DockSurface : Grid
         {
             Item = dockItem;
             Content.Child = dockItem.Content;
+
+            
+
             Update();
         }
         else if (HasItem)
         {
+  
+
             var currentItem = DetachItem(false);
             var current = new DockSurface(this.Context);
             current.Add(currentItem);
@@ -115,6 +126,9 @@ public class DockSurface : Grid
         }
         else
         {
+        
+
+
             var current = new DockSurface(this.Context);
             current.From(this);
 
@@ -124,6 +138,8 @@ public class DockSurface : Grid
         }
 
         Update();
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void Remove()
@@ -193,6 +209,8 @@ public class DockSurface : Grid
         ParentSurface.Content.Child = remain.DetachChild();
         ParentSurface.Update();
         ParentSurface = null;
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void Clear()
@@ -204,6 +222,8 @@ public class DockSurface : Grid
         Top = null;
         Item = null;
         Update();
+
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public bool IsHovered(Point p, out DockSurface hovered)
@@ -247,8 +267,8 @@ public class DockSurface : Grid
         if (IsEmpty)
             return DockDirection.Stack;
 
-        var xSize = Math.Min(ActualWidth * .3, 80);
-        var ySize = Math.Min(ActualHeight * .3, 80);
+        var xSize = Math.Min(ActualWidth * .3, 200);
+        var ySize = Math.Min(ActualHeight * .3, 200);
 
         if (o.X < xSize) return DockDirection.Left;
         if (o.X > ActualWidth - xSize) return DockDirection.Right;
@@ -261,6 +281,9 @@ public class DockSurface : Grid
     {
         if (this.Item != null)
         {
+            RenderOptions.SetEdgeMode(Content, EdgeMode.Aliased);
+
+
             this.Item.Surface = this;
             this.Item.Context = this.Context;
             Tab.Children.Clear();
@@ -268,6 +291,8 @@ public class DockSurface : Grid
             {
                 Title = Item.Title,
             };
+                //as System.Windows.Controls.Button;
+
             //var ress = Application.Current.Resources;
             //btn.Style = Application.Current.FindResource("DockButtonStyle") as Style;
             Tab.Children.Add(btn);
@@ -275,17 +300,25 @@ public class DockSurface : Grid
 
             //Content.BorderBrush = Brushes.Goldenrod;
             Content.BorderThickness = new Thickness(2);
-            Content.BorderBrush = new SolidColorBrush(Color.FromRgb(221, 221, 221));
+            byte num = 221;
+            num = 243;
+            //Content.BorderBrush = new SolidColorBrush(Color.FromRgb(221, 221, 221));
+            Content.BorderBrush = new SolidColorBrush(Color.FromRgb(num, num, num));
+            Content.Background = new SolidColorBrush(Color.FromRgb(num, num, num));
 
             BindTabButtonEvents(btn);
 
 
             Context.OnDockStateChanged(this.Item, DockState.Docked);
+
         }
         else
         {
+            RenderOptions.SetEdgeMode(Content, EdgeMode.Unspecified);
+
             ShowTab = false;
             Content.BorderThickness = new Thickness(0);
+            Content.Background = Brushes.Transparent;
         }
 
         if (Right != null)
@@ -308,12 +341,14 @@ public class DockSurface : Grid
                 Update();
         }
 
+        DockedItemsChanged?.Invoke(this, EventArgs.Empty);
+
         return item;
     }
     internal static DockSurface Merge(DockSurface target, DockSurface current, DockSurface next, DockDirection dir, double percent)
     {
         var brush = Brushes.Transparent;
-        var size = 6;
+        var size = 4;
         UIElement content = null;
         if (dir == DockDirection.Left) content = LayoutHelper.Horizontal(next, current, size, brush, percent);
         if (dir == DockDirection.Right) content = LayoutHelper.Horizontal(current, next, size, brush, percent);
@@ -358,25 +393,13 @@ public class DockSurface : Grid
 
         return target;
     }
-    void BindTabButtonEvents(System.Windows.Controls.Control button)
+    void BindTabButtonEvents(DockTabButton dockTabButton)
     {
         var begin = new Point();
         var offset = new Point();
         var down = false;
-        button.PreviewMouseDown += (s, e) =>
-        {
-            if (e.MiddleButton == MouseButtonState.Pressed)
-            {
-                this.Remove();
-            }
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                down = true;
-                begin = Win32Helper.GetMousePosition();
-                offset = button.PointFromScreen(begin);
-            }
-        };
-        button.PreviewMouseDoubleClick += (s, e) =>
+
+        dockTabButton.handle.PreviewMouseDoubleClick += (s, e) =>
         {
             var ds = this.ParentSurface ?? this;
             var dd = this.GetCurrentDockDirectionAtParent();
@@ -401,19 +424,45 @@ public class DockSurface : Grid
             win.WindowState = WindowState.Maximized;
             win.Activate();
         };
-        button.PreviewMouseUp += (s, e) => { down = false; };
-        button.PreviewMouseMove += (s, e) =>
+        dockTabButton.handle.PreviewMouseDown += (s, e) =>
+        {
+            if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                this.Remove();
+            }else
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                down = true;
+                begin = Win32Helper.GetMousePosition();
+                //offset = button.PointFromScreen(begin);
+                offset = e.GetPosition(this);
+                //_ = 1;
+
+            }
+        };
+        dockTabButton.handle.PreviewMouseUp += (s, e) => { 
+            down = false;
+        };
+        dockTabButton.handle.PreviewMouseMove += (s, e) =>
         {
             if (!down)
                 return;
-            var pos = Win32Helper.GetMousePosition();
-            var bounds = button.PointFromScreen(pos);
 
-            if (bounds.X < 0 || bounds.Y < 0 || bounds.X > button.ActualWidth || bounds.Y > button.ActualHeight)
+            var rootWindow = Window.GetWindow(this);
+
+            var pos = Win32Helper.GetMousePosition();
+            var bounds = dockTabButton.PointFromScreen(pos);
+            var cpos = e.GetPosition(null);
+
+            if (bounds.X < 0 || bounds.Y < 0 || bounds.X > dockTabButton.ActualWidth || bounds.Y > dockTabButton.ActualHeight)
             {
                 var ds = this.ParentSurface ?? this;
                 var dd = this.GetCurrentDockDirectionAtParent();
                 var dp = this.ParentSurface?.GetDockPortion() ?? 0;
+
+                var mp = Win32Helper.GetMousePosition();
+                var preview = NetDock.WPF.Forms.DockPreview.Get(false);
+                var scale = DPIUtil.ScaleFactor(preview, new System.Drawing.Point((int)mp.X, (int)mp.Y)) / 100;
 
                 Detach();
                 var item = DetachItem(true);
@@ -423,15 +472,35 @@ public class DockSurface : Grid
                 win.DockedDirection = dd;
                 win.DockedPercentage = dp;
 
-                win.Left = pos.X - offset.X;
-                win.Top = pos.Y - offset.Y;
-                win.Width = ActualWidth;
-                win.Height = ActualHeight;
+                var winAbs = rootWindow.GetAbsolutePosition();
+
+                var left = winAbs.X + cpos.X - offset.X;
+                var top = winAbs.Y + cpos.Y - offset.Y;
+
+                win.Left = left; //pos.X;// - offset.X;
+                win.Top = top;// - offset.Y;
+                win.Width = ActualWidth;// * scale;
+                win.Height = ActualHeight;// * scale;
 
                 win.Show();
+
+                win.Left = left; //pos.X;// - offset.X;
+                win.Top = top;// - offset.Y;
+
                 win.Activate();
                 win.DragMove();
             }
+        };
+        dockTabButton.closeButton.PreviewMouseDown += (s, e) =>
+        {
+            if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                this.Remove();
+            }
+        };
+        dockTabButton.closeButton.Click += (s, e) =>
+        {
+           this.Remove();
         };
     }
     UIElement DetachChild()
@@ -472,4 +541,69 @@ public class DockSurface : Grid
         }
     }
 
+}
+
+
+static class OSInterop
+{
+    [DllImport("user32.dll")]
+    public static extern int GetSystemMetrics(int smIndex);
+    public const int SM_CMONITORS = 80;
+
+    [DllImport("user32.dll")]
+    public static extern bool SystemParametersInfo(int nAction, int nParam, ref RECT rc, int nUpdate);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern bool GetMonitorInfo(HandleRef hmonitor, [In, Out] MONITORINFOEX info);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr MonitorFromWindow(HandleRef handle, int flags);
+
+    public struct RECT
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+        public int width { get { return right - left; } }
+        public int height { get { return bottom - top; } }
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Auto)]
+    public class MONITORINFOEX
+    {
+        public int cbSize = Marshal.SizeOf(typeof(MONITORINFOEX));
+        public RECT rcMonitor = new RECT();
+        public RECT rcWork = new RECT();
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        public char[] szDevice = new char[32];
+        public int dwFlags;
+    }
+}
+
+static class WPFExtensionMethods
+{
+    public static Point GetAbsolutePosition(this Window w)
+    {
+        if (w.WindowState != WindowState.Maximized)
+            return new Point(w.Left, w.Top);
+
+        Int32Rect r;
+        bool multimonSupported = OSInterop.GetSystemMetrics(OSInterop.SM_CMONITORS) != 0;
+        if (!multimonSupported)
+        {
+            OSInterop.RECT rc = new OSInterop.RECT();
+            OSInterop.SystemParametersInfo(48, 0, ref rc, 0);
+            r = new Int32Rect(rc.left, rc.top, rc.width, rc.height);
+        }
+        else
+        {
+            WindowInteropHelper helper = new WindowInteropHelper(w);
+            IntPtr hmonitor = OSInterop.MonitorFromWindow(new HandleRef((object)null, helper.EnsureHandle()), 2);
+            OSInterop.MONITORINFOEX info = new OSInterop.MONITORINFOEX();
+            OSInterop.GetMonitorInfo(new HandleRef((object)null, hmonitor), info);
+            r = new Int32Rect(info.rcWork.left, info.rcWork.top, info.rcWork.width, info.rcWork.height);
+        }
+        return new Point(r.X, r.Y);
+    }
 }

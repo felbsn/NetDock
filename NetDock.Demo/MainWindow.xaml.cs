@@ -2,6 +2,7 @@
 using NetDock.Demo;
 using NetDock.WPF.Helpers;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -127,12 +128,14 @@ namespace NetDock.WPF.Demo
         public void dock_save(object sender, EventArgs e)
         {
             xml = ds.ToXml();
-
-            MessageBox.Show(xml);
-
+            File.WriteAllText("_saved.xml", xml);
         }
         public void dock_load(object sender, EventArgs e)
         {
+            if (!File.Exists("_saved.xml"))
+                return;
+
+            var xml = File.ReadAllText("_saved.xml");
             ds.FromXml(xml);
         }
     }

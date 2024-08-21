@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,6 +62,13 @@ public static class LayoutHelper
         gridSplitter.Height = SplitterSize;
         gridSplitter.HorizontalAlignment = HorizontalAlignment.Stretch;
         gridSplitter.Background = SplitBrush;
+        gridSplitter.ShowsPreview = false;
+
+        gridSplitter.DragDelta += (s, e) =>
+        {
+            //todo: a better option?
+            //Thread.Sleep(10);
+        };
 
         Grid.SetRow(top, 0);
         grid.Children.Add(top);
@@ -98,7 +106,13 @@ public static class LayoutHelper
         gridSplitter.Width = SplitterSize;
         gridSplitter.HorizontalAlignment = HorizontalAlignment.Stretch;
         gridSplitter.Background = SplitBrush;
+        gridSplitter.ShowsPreview = false;
 
+        gridSplitter.DragDelta += (s, e) =>
+        {
+            //todo: a better option?
+            //Thread.Sleep(10);
+        };
 
         Grid.SetColumn(left, 0);
         grid.Children.Add(left);

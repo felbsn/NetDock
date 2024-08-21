@@ -7,6 +7,7 @@ namespace NetDock.WPF.Forms;
 
 public static class FormExtensions
 {
+    public static double scale = 1.0;
     public static Dictionary<Form, (int id, int x, int y, int width, int height, double opacity, Task t, int duration)> tasks = new();
 
 
@@ -15,8 +16,8 @@ public static class FormExtensions
         var sw = Stopwatch.StartNew();
         var p = 0.0;
 
-        var baseW = form.Width;
-        var baseH = form.Height;
+        var baseW = (int)(form.Width * scale);
+        var baseH = (int)(form.Height * scale);
 
         var diff_width = width - baseW;
         var diff_height = height - baseH;
@@ -45,9 +46,8 @@ public static class FormExtensions
         var sw = Stopwatch.StartNew();
         var p = 0.0;
 
-
-        var baseW = form.Width;
-        var baseH = form.Height;
+        var baseW =  (int)(scale * (form.Width));
+        var baseH =  (int)(scale * (form.Height));
         var baseX = form.Location.X;
         var baseY = form.Location.Y;
 
@@ -93,6 +93,9 @@ public static class FormExtensions
     }
     public static Task ResizeSmoothAsync(this Form form, int x, int y, int width, int height, double opacity = 1.0, int duration = 200, bool suspend = true)
     {
+        width = (int)(width * scale);
+        height = (int)(height * scale);
+
         if (tasks.TryGetValue(form, out var cur))
         {
             if (cur.x == x && cur.y == y && cur.width == width && cur.height == height && opacity == cur.opacity)
@@ -106,8 +109,8 @@ public static class FormExtensions
 
         var p = 0.0;
 
-        var baseW = form.Width;
-        var baseH = form.Height;
+        var baseW = (int)(form.Width *  scale);
+        var baseH = (int)(form.Height *  scale);
         var baseX = form.Location.X;
         var baseY = form.Location.Y;
         var baseOp = form.Opacity;
@@ -142,8 +145,8 @@ public static class FormExtensions
                     // Console.WriteLine("animation changed with id " + id);
                     var c = tasks[form];
                     p = 0.0;
-                    baseW = form.Width;
-                    baseH = form.Height;
+                    baseW = (int)(form.Width * scale);
+                    baseH = (int)(form.Height * scale);
                     baseX = form.Location.X;
                     baseY = form.Location.Y;
                     baseOp = form.Opacity;
@@ -206,7 +209,6 @@ public static class FormExtensions
                     form.Hide();
             });
         });
-
     }
     public static void StartDrag(this Form form)
     {
@@ -216,8 +218,6 @@ public static class FormExtensions
         ReleaseCapture();
         SendMessage(form.Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
     }
-
-
 
     public static void MakeTransparent(this Form form)
     {
